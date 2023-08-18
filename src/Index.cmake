@@ -281,6 +281,9 @@ macro(project_options)
   # allow for static analysis options
   if(${ProjectOptions_ENABLE_CPPCHECK})
     enable_cppcheck("${ProjectOptions_CPPCHECK_OPTIONS}")
+
+    # This will exclude all things taken in by CPM
+    suppress_cppcheck_path("${CMAKE_BINARY_DIR}")
   endif()
 
   if(${ProjectOptions_ENABLE_CLANG_TIDY})

@@ -364,3 +364,37 @@ macro(target_disable_static_analysis TARGET)
   target_disable_vs_analysis(${TARGET})
   target_disable_include_what_you_use(${TARGET})
 endmacro()
+
+function(suppress_cppcheck_path src_dir)
+  # Don't bother suppressing if this isn't enabled in the first place
+  if ("${CMAKE_CXX_CPPCHECK}" STREQUAL "")
+    return()
+  endif()
+
+  get_filename_component(build_dir_abs ${CMAKE_BINARY_DIR} ABSOLUTE)
+  get_filename_component(src_dir_abs ${src_dir} ABSOLUTE)
+  string(FIND ${src_dir_abs} ${build_dir_abs} is_subdir)
+
+  if (IS_DIRECTORY ${src_dir})
+    message(DEBUG "CppCheck: Ignoring Directory ${src_dir}")
+
+    # strip the trailing '/', if it exists, so we can safely add it in the token
+    # This is not Windows compatible because cppcheck isn't compatible with this
+    string(REGEX REPLACE "/$" "" src_dir ${src_dir})
+    set(token "--suppress=*:${src_dir}/*")
+  elseif(IS_REGULAR_FILE ${src_dir})
+    message(DEBUG "CppCheck: Ignoring file ${src_dir}")
+    set(token "--suppress=*:${src_dir}")
+  else()
+    message(WARNING "Path ${src_dir} is not a directory or file. Not ignoring!")
+    return()
+  endif()
+
+  message(DEBUG "Suppressing token: ${token}")
+  list(APPEND CMAKE_CXX_CPPCHECK ${token})
+  set(CMAKE_CXX_CPPCHECK ${CMAKE_CXX_CPPCHECK} PARENT_SCOPE)
+  if (NOT "${CMAKE_C_CPPCHECK}" STREQUAL "")
+    list(APPEND CMAKE_C_CPPCHECK ${token})
+    set(CMAKE_C_CPPCHECK ${CMAKE_C_CPPCHECK} PARENT_SCOPE)
+  endif()
+endfunction()

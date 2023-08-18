@@ -11,7 +11,6 @@ endfunction()
 function(
   set_project_warnings
   _project_name
-  WARNINGS_AS_ERRORS
   MSVC_WARNINGS
   CLANG_WARNINGS
   GCC_WARNINGS
@@ -88,13 +87,6 @@ function(
     foreach(_warning ${_CUDA_WARNINGS})
       list(APPEND CUDA_WARNINGS "-Xcompiler=${_warning}")
     endforeach()
-  endif()
-
-  if(WARNINGS_AS_ERRORS)
-    message(TRACE "Warnings are treated as errors")
-    list(APPEND CLANG_WARNINGS -Werror)
-    list(APPEND GCC_WARNINGS -Werror)
-    list(APPEND MSVC_WARNINGS /WX)
   endif()
 
   if(MSVC)

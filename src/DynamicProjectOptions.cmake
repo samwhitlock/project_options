@@ -138,6 +138,7 @@ macro(dynamic_project_options)
   # <option type>;<option name>;<user mode default>;<developer mode default>;<description>
   set(options
       "0\;WARNINGS_AS_ERRORS\;OFF\;ON\;Treat warnings as Errors"
+      "0\;WARNINGS_AS_ERRORS_STATIC_ANALYSIS\;OFF\;OFF\;Treat static analysis warnings as Errors"
       "0\;ENABLE_COVERAGE\;OFF\;OFF\;Analyze and report on coverage"
       "0\;ENABLE_CPPCHECK\;OFF\;${MAKEFILE_OR_NINJA}\;Enable cppcheck analysis during compilation"
       "0\;ENABLE_CLANG_TIDY\;OFF\;${MAKEFILE_OR_NINJA}\;Enable clang-tidy analysis during compilation"
@@ -250,6 +251,7 @@ macro(dynamic_project_options)
 
   project_options(
     ${WARNINGS_AS_ERRORS_VALUE}
+    ${WARNINGS_AS_ERRORS_STATIC_ANALYSIS_VALUE}
     ${ENABLE_COVERAGE_VALUE}
     ${ENABLE_CPPCHECK_VALUE}
     ${ENABLE_CLANG_TIDY_VALUE}

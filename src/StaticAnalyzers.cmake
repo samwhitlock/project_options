@@ -30,7 +30,8 @@ macro(enable_cppcheck CPPCHECK_OPTIONS)
       set(CMAKE_CXX_CPPCHECK ${CPPCHECK} --template=${CPPCHECK_TEMPLATE} ${CPPCHECK_OPTIONS})
     endif()
 
-    if(WARNINGS_AS_ERRORS)
+    if(WARNINGS_AS_ERRORS_STATIC_ANALYSIS)
+      message(TRACE "Setting CPPCheck warnings as errors")
       list(APPEND CMAKE_CXX_CPPCHECK --error-exitcode=2)
     endif()
 
@@ -191,7 +192,8 @@ macro(enable_clang_tidy CLANG_TIDY_EXTRA_ARGUMENTS)
     set(CLANG_TIDY_C_FLAGS "-extra-arg=-Wno-unknown-warning-option")
 
     # set warnings as errors
-    if(WARNINGS_AS_ERRORS)
+    if(WARNINGS_AS_ERRORS_STATIC_ANALYSIS)
+      message(TRACE "Setting clang tidy warnings as errors")
       list(APPEND CLANG_TIDY_CXX_FLAGS -warnings-as-errors=*)
       list(APPEND CLANG_TIDY_C_FLAGS -warnings-as-errors=*)
     endif()

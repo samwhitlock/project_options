@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.20)
-# 3.20 is required by the windows toolchain and cmake_path. It also has a more reliable building functionality.
-# 3.18 required by package_project and interprocedural optimization. It also has a more reliable building functionality (no errors during the linking stage).
+cmake_minimum_required(VERSION 3.25)
+# Need 3.25 for the block command
 
 include_guard()
 
 # fix DOWNLOAD_EXTRACT_TIMESTAMP warning in FetchContent
+# https://cmake.org/cmake/help/latest/policy/CMP0135.html
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
 endif()
@@ -119,6 +119,7 @@ front of them:
 macro(project_options)
   set(options
       WARNINGS_AS_ERRORS
+      WARNINGS_AS_ERRORS_STATIC_ANALYSIS
       ENABLE_COVERAGE
       ENABLE_CPPCHECK
       ENABLE_CLANG_TIDY
@@ -172,10 +173,16 @@ macro(project_options)
 
   # set warning message level
   if(${ProjectOptions_WARNINGS_AS_ERRORS})
+    # This macro should take care of it according to CMake's properties
+    set(COMPILE_WARNING_AS_ERROR ON)
     set(WARNINGS_AS_ERRORS ${ProjectOptions_WARNINGS_AS_ERRORS})
     set(WARNING_MESSAGE SEND_ERROR)
   else()
     set(WARNING_MESSAGE WARNING)
+  endif()
+
+  if (${ProjectOptions_WARNINGS_AS_ERRORS_STATIC_ANALYSIS})
+    set(WARNINGS_AS_ERRORS_STATIC_ANALYSIS ${ProjectOptions_WARNINGS_AS_ERRORS_STATIC_ANALYSIS})
   endif()
 
   common_project_options(${ProjectOptions_ENABLE_COMPILE_COMMANDS_SYMLINK})
@@ -237,7 +244,6 @@ macro(project_options)
   # standard compiler warnings
   set_project_warnings(
     ${_warnings_target}
-    "${WARNINGS_AS_ERRORS}"
     "${ProjectOptions_MSVC_WARNINGS}"
     "${ProjectOptions_CLANG_WARNINGS}"
     "${ProjectOptions_GCC_WARNINGS}"

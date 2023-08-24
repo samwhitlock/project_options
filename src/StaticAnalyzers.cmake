@@ -243,14 +243,19 @@ macro(enable_vs_analysis VS_ANALYSIS_RULESET)
 endmacro()
 
 # Enable static analysis with include-what-you-use
-macro(enable_include_what_you_use)
+function(enable_include_what_you_use INCLUDE_WHAT_YOU_USE_ARGUMENTS)
   find_program(INCLUDE_WHAT_YOU_USE include-what-you-use)
   if(INCLUDE_WHAT_YOU_USE)
-    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${INCLUDE_WHAT_YOU_USE})
+    # All iwyu-specific options need to be prefixed by "-Xiwyu"
+    set(arg_list ${INCLUDE_WHAT_YOU_USE})
+    foreach(item IN LISTS INCLUDE_WHAT_YOU_USE_ARGUMENTS)
+      list(APPEND arg_list "-Xiwyu" ${item})
+    endforeach()
+    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${arg_list} PARENT_SCOPE)
   else()
     message(${WARNING_MESSAGE} "include-what-you-use requested but executable not found")
   endif()
-endmacro()
+endfunction()
 
 # Enable static analysis inside GCC
 macro(enable_gcc_analyzer _project_name GCC_ANALYZER_EXTRA_ARGUMENTS)

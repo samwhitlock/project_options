@@ -164,6 +164,7 @@ macro(project_options)
       GCC_WARNINGS
       CUDA_WARNINGS
       CPPCHECK_OPTIONS
+      INCLUDE_WHAT_YOU_USE_ARGUMENTS
       CLANG_TIDY_EXTRA_ARGUMENTS
       GCC_ANALYZER_EXTRA_ARGUMENTS
       PCH_HEADERS
@@ -295,7 +296,7 @@ macro(project_options)
   endif()
 
   if(${ProjectOptions_ENABLE_INCLUDE_WHAT_YOU_USE})
-    enable_include_what_you_use()
+    enable_include_what_you_use("${ProjectOptions_INCLUDE_WHAT_YOU_USE_ARGUMENTS}")
   endif()
 
   if(${ProjectOptions_ENABLE_GCC_ANALYZER})

@@ -179,6 +179,7 @@ macro(dynamic_project_options)
       "2\;CUDA_WARNINGS\;\;\;Override the defaults for the CUDA warnings"
       "2\;CPPCHECK_OPTIONS\;\;\;Override the defaults for the options passed to cppcheck"
       "2\;CLANG_TIDY_EXTRA_ARGUMENTS\;\;\;Additional arguments to use for clang-tidy invocation"
+      "2\;INCLUDE_WHAT_YOU_USE_ARGUMENTS\;\;\;Additional arguments to use for iwyu invocation"
       "2\;GCC_ANALYZER_EXTRA_ARGUMENTS\;\;\;Additional arguments to use for GCC static analysis"
       "2\;PCH_HEADERS\;\;\;List of the headers to precompile"
       "2\;CONAN_OPTIONS\;\;\;Extra Conan options"
@@ -293,6 +294,7 @@ macro(dynamic_project_options)
     ${CPPCHECK_OPTIONS_VALUE}
     ${CLANG_TIDY_EXTRA_ARGUMENTS_VALUE}
     ${GCC_ANALYZER_EXTRA_ARGUMENTS_VALUE}
+    ${INCLUDE_WHAT_YOU_USE_ARGUMENTS_VALUE}
     ${PCH_HEADERS_VALUE}
     ${CONAN_OPTIONS_VALUE}
     ${ARGN}

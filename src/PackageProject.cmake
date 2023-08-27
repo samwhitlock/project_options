@@ -266,13 +266,12 @@ function(package_project)
   )
 
   # download ForwardArguments
-  FetchContent_Declare(
-    _fargs URL https://github.com/polysquare/cmake-forward-arguments/archive/refs/tags/v1.0.0.zip
+  CPMAddPackage(
+    NAME _fargs
+    GITHUB_REPOSITORY polysquare/cmake-forward-arguments
+    GIT_TAG "v1.0.0"
+    DOWNLOAD_ONLY True
   )
-  FetchContent_GetProperties(_fargs)
-  if(NOT _fargs_POPULATED)
-    FetchContent_Populate(_fargs)
-  endif()
   include("${_fargs_SOURCE_DIR}/ForwardArguments.cmake")
 
   # prepare the forward arguments for ycm
@@ -289,12 +288,12 @@ function(package_project)
   )
 
   # download ycm
-  set(YCM_VERSION "v0.15.3" CACHE STRING "YCM Github version")
-  FetchContent_Declare(_ycm URL "https://github.com/robotology/ycm/archive/refs/tags/${YCM_VERSION}.zip")
-  FetchContent_GetProperties(_ycm)
-  if(NOT _ycm_POPULATED)
-    FetchContent_Populate(_ycm)
-  endif()
+  CPMAddPackage(
+    NAME _ycm
+    GITHUB_REPOSITORY robotology/ycm
+    GIT_TAG "v0.15.3"
+    DOWNLOAD_ONLY True
+  )
   include("${_ycm_SOURCE_DIR}/modules/InstallBasicPackageFiles.cmake")
 
   install_basic_package_files(${_PackageProject_NAME} "${_FARGS_LIST}")

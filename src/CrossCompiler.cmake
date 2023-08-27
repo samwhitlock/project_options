@@ -355,15 +355,13 @@ macro(enable_cross_compiler)
       set(EMSCRIPTEN_ROOT $ENV{EMSCRIPTEN})
     else()
       if(NOT DEFINED EMSCRIPTEN_ROOT)
-        include(FetchContent)
-        message(STATUS "fetch emscripten repo main branch. ...")
-        FetchContent_Declare(
-          emscripten GIT_REPOSITORY https://github.com/emscripten-core/emscripten GIT_TAG main
+        message(STATUS "fetching emscripten repo. ...")
+        CPMAddPackage(
+          NAME emscripten
+          GITHUB_REPOSITORY emscripten-core/emscripten
+          GIT_TAG main
         )
-        if(NOT emscripten_POPULATED)
-          FetchContent_Populate(emscripten)
-          set(EMSCRIPTEN_ROOT "${emscripten_SOURCE_DIR}")
-        endif()
+        set(EMSCRIPTEN_ROOT "${emscripten_SOURCE_DIR}")
       endif()
     endif()
     if(NOT "$ENV{EMSDK}" STREQUAL "")

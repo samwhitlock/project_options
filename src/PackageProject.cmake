@@ -289,7 +289,8 @@ function(package_project)
   )
 
   # download ycm
-  FetchContent_Declare(_ycm URL https://github.com/robotology/ycm/archive/refs/tags/v0.13.0.zip)
+  set(YCM_VERSION "v0.15.3" CACHE STRING "YCM Github version")
+  FetchContent_Declare(_ycm URL "https://github.com/robotology/ycm/archive/refs/tags/${YCM_VERSION}.zip")
   FetchContent_GetProperties(_ycm)
   if(NOT _ycm_POPULATED)
     FetchContent_Populate(_ycm)

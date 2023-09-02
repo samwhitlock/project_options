@@ -212,18 +212,30 @@ macro(dynamic_project_options)
       set(option_developer_default ${${option_name}_DEVELOPER_DEFAULT})
     endif()
 
-    # TODO This is the only way I was able to gte the behavior, but it does not create an actual option
-    if(NOT OPT_${option_name})
-      if(ENABLE_DEVELOPER_MODE)
-        set(option_implicit_default ${option_developer_default})
-      else()
-        set(option_implicit_default ${option_user_default})
-      endif()
-
+    if(ENABLE_DEVELOPER_MODE)
+      set(option_implicit_default ${option_developer_default})
+    else()
+      set(option_implicit_default ${option_user_default})
+    endif()
+    if(OPT_${option_name})
       if(option_type EQUAL 0)
-        set(OPT_${option_name} ${option_implicit_default} CACHE BOOL ${option_description})
+        option(OPT_${option_name} "${option_description}" ${option_implicit_default})
       else()
-        set(OPT_${option_name} "${option_implicit_default}" CACHE STRING ${option_description})
+        option(OPT_${option_name} "${option_description}" "${option_implicit_default}")
+      endif()
+    else()
+      if(option_type EQUAL 0)
+        cmake_dependent_option(
+          OPT_${option_name} "${option_description}" ${option_developer_default}
+          ENABLE_DEVELOPER_MODE ${option_user_default}
+        )
+        set(OPT_${option_name} ${option_implicit_default})
+      else()
+        cmake_dependent_option(
+          OPT_${option_name} "${option_description}" "${option_developer_default}"
+          ENABLE_DEVELOPER_MODE "${option_user_default}"
+        )
+        set(OPT_${option_name} "${option_implicit_default}")
       endif()
     endif()
 

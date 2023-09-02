@@ -221,9 +221,9 @@ macro(dynamic_project_options)
       endif()
 
       if(option_type EQUAL 0)
-        set(OPT_${option_name} ${option_implicit_default})
+        set(OPT_${option_name} ${option_implicit_default} CACHE BOOL ${option_description})
       else()
-        set(OPT_${option_name} "${option_implicit_default}")
+        set(OPT_${option_name} "${option_implicit_default}" CACHE STRING ${option_description})
       endif()
     endif()
 

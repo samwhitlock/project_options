@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-# Need 3.25 for the block command
+# Need 3.25 for the block command, and checking cxx compiler flags
 
 include_guard()
 

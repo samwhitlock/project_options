@@ -132,8 +132,6 @@ macro(dynamic_project_options)
     set(MAKEFILE_OR_NINJA OFF)
   endif()
 
-  include(CMakeDependentOption)
-
   # <option type>;<option name>;<user mode default>;<developer mode default>;<description>
   set(options
       "0\;WARNINGS_AS_ERRORS\;OFF\;ON\;Treat warnings as Errors"
@@ -209,7 +207,8 @@ macro(dynamic_project_options)
       set(option_developer_default ${${option_name}_DEVELOPER_DEFAULT})
     endif()
 
-    if(OPT_${option_name})
+    if(DEFINED OPT_${option_name}) # user has specified the op
+      # Create the implicit default based on the current dev mode setting
       if(ENABLE_DEVELOPER_MODE)
         set(option_implicit_default ${option_developer_default})
       else()
@@ -218,29 +217,36 @@ macro(dynamic_project_options)
       if(option_type EQUAL 0)
         option(OPT_${option_name} "${option_description}" ${option_implicit_default})
       else()
-        option(OPT_${option_name} "${option_description}" "${option_implicit_default}")
+        set(OPT_${option_name} "${option_implicit_default}" CACHE STRING "${option_description}")
       endif()
     else()
+      # This is basically the implied calculation of CMake's Dependent Option,
+      # but it looks like there's a weird bug in how that is supposed to set it for this use case.
       if(option_type EQUAL 0)
-        cmake_dependent_option(
-          OPT_${option_name} "${option_description}" ${option_developer_default} ENABLE_DEVELOPER_MODE
-          ${option_user_default}
-        )
+        if(ENABLE_DEVELOPER_MODE)
+          set(OPT_${option_name} ${option_developer_default} CACHE BOOL "${option_description}" FORCE)
+        else()
+          # Internal implies force
+          set(OPT_${option_name} ${option_user_default} CACHE INTERNAL "${option_description}")
+        endif()
       else()
-        cmake_dependent_option(
-          OPT_${option_name} "${option_description}" "${option_developer_default}" ENABLE_DEVELOPER_MODE
-          "${option_user_default}"
-        )
+        if(ENABLE_DEVELOPER_MODE)
+          set(OPT_${option_name} "${option_developer_default}" CACHE STRING "${option_description}" FORCE)
+        else()
+          # Internal implies force
+          set(OPT_${option_name} "${option_user_default}" CACHE INTERNAL "${option_description}")
+        endif()
       endif()
     endif()
 
+    # Set the _VALUE version to pump into project_options only if it isn't "falsey"
     if(OPT_${option_name})
       if(option_type EQUAL 0)
         set(${option_name}_VALUE ${option_name})
       elseif(option_type EQUAL 1)
-        set(${option_name}_VALUE ${option_name} "${OPT_${option_name}}")
+        set(${option_name}_VALUE "${OPT_${option_name}}")
       elseif(option_type EQUAL 2)
-        set(${option_name}_VALUE ${option_name} ${OPT_${option_name}})
+        set(${option_name}_VALUE ${OPT_${option_name}})
       endif()
     else()
       unset(${option_name}_VALUE)

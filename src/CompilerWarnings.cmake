@@ -125,6 +125,49 @@ function(
 
   set(PROJECT_WARNINGS_CUDA "${CUDA_WARNINGS}")
 
+  block(SCOPE_FOR VARIABLES PROPAGATE PROJECT_WARNINGS_CXX PROJECT_WARNINGS_C)
+    # Make sure we unset conflicting cxx flags, but we don't want to override them permanently.
+    unset(CMAKE_CXX_FLAGS)
+    unset(CMAKE_C_FLAGS)
+
+    set(VALID_WARNINGS "")
+    set(INVALID_WARNINGS "")
+
+    include(CheckCXXCompilerFlag)
+    foreach(WARNING ${PROJECT_WARNINGS_CXX})
+      check_cxx_compiler_flag("${WARNING}" RESULT)
+      if(${RESULT})
+        list(APPEND VALID_WARNINGS "${WARNING}")
+      else()
+        list(APPEND INVALID_WARNINGS "${WARNING}")
+      endif()
+    endforeach()
+
+    set(PROJECT_WARNINGS_CXX ${VALID_WARNINGS})
+    if(INVALID_WARNINGS)
+      message(WARNING "Filtering the following invalid warnings for the CXX compiler ${CMAKE_CXX_COMPILER_ID}: ${INVALID_WARNINGS}")
+    endif()
+
+    set(VALID_WARNINGS "")
+    set(INVALID_WARNINGS "")
+
+    include(CheckCCompilerFlag)
+    foreach(WARNING ${PROJECT_WARNINGS_C})
+      check_cxx_compiler_flag("${WARNING}" RESULT)
+      if(${RESULT})
+        list(APPEND VALID_WARNINGS "${WARNING}")
+      else()
+        list(APPEND INVALID_WARNINGS "${WARNING}")
+      endif()
+    endforeach()
+
+    set(PROJECT_WARNINGS_C ${VALID_WARNINGS})
+    if(INVALID_WARNINGS)
+      message(WARNING "Filtering the following invalid warnings for the C compiler ${CMAKE_C_COMPILER_ID}: ${INVALID_WARNINGS}")
+    endif()
+
+  endblock()
+
   target_compile_options(
     ${_project_name}
     INTERFACE # C++ warnings

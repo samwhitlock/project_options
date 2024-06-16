@@ -135,12 +135,14 @@ function(
 
     include(CheckCXXCompilerFlag)
     foreach(WARNING ${PROJECT_WARNINGS_CXX})
-      check_cxx_compiler_flag("${WARNING}" RESULT)
-      if(${RESULT})
+      string(REGEX REPLACE "[^a-zA-Z0-9]" "_" WARNING_VAR "${WARNING}")
+      check_cxx_compiler_flag("${WARNING}" "${WARNING_VAR}")
+      if(${WARNING_VAR})
         list(APPEND VALID_WARNINGS "${WARNING}")
       else()
         list(APPEND INVALID_WARNINGS "${WARNING}")
       endif()
+      unset("${WARNING_VAR}")
     endforeach()
 
     set(PROJECT_WARNINGS_CXX ${VALID_WARNINGS})
@@ -153,12 +155,14 @@ function(
 
     include(CheckCCompilerFlag)
     foreach(WARNING ${PROJECT_WARNINGS_C})
-      check_cxx_compiler_flag("${WARNING}" RESULT)
-      if(${RESULT})
+      string(REGEX REPLACE "[^a-zA-Z0-9]" "_" WARNING_VAR "${WARNING}")
+      check_cxx_compiler_flag("${WARNING}" "${WARNING_VAR}")
+      if(${WARNING_VAR})
         list(APPEND VALID_WARNINGS "${WARNING}")
       else()
         list(APPEND INVALID_WARNINGS "${WARNING}")
       endif()
+      unset("${WARNING_VAR}")
     endforeach()
 
     set(PROJECT_WARNINGS_C ${VALID_WARNINGS})

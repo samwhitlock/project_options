@@ -139,8 +139,6 @@ macro(dynamic_project_options)
     set(MAKEFILE_OR_NINJA OFF)
   endif()
 
-  include(CMakeDependentOption)
-
   # <option type>;<option name>;<user mode default>;<developer mode default>;<description>
   set(options
       "0\;WARNINGS_AS_ERRORS\;OFF\;ON\;Treat warnings as Errors"
@@ -196,8 +194,6 @@ macro(dynamic_project_options)
     list(GET option 3 option_developer_default)
     list(GET option 4 option_description)
 
-    # First, we need to check that the user didn't define conflicting defaults
-    # i.e. a "global" one and one of the individual ones.
     if(DEFINED ${option_name}_DEFAULT)
       if(DEFINED ${option_name}_DEVELOPER_DEFAULT OR DEFINED ${option_name}_USER_DEFAULT)
         message(
@@ -218,26 +214,40 @@ macro(dynamic_project_options)
       set(option_developer_default ${${option_name}_DEVELOPER_DEFAULT})
     endif()
 
-    # Set the implicit default for use in the subsequent settings
-    if(ENABLE_DEVELOPER_MODE)
-      set(option_implicit_default ${option_developer_default})
+
+    if(OPT_${option_name}) # user has specified the op
+      # Create the implicit default based on the current dev mode setting
+      if(ENABLE_DEVELOPER_MODE)
+        set(option_implicit_default ${option_developer_default})
+      else()
+        set(option_implicit_default ${option_user_default})
+      endif()
+      if(option_type EQUAL 0)
+        option(OPT_${option_name} "${option_description}" ${option_implicit_default})
+      else()
+        set(OPT_${option_name} "${option_implicit_default}" CACHE STRING "${option_description}")
+      endif()
     else()
-      set(option_implicit_default ${option_user_default})
+      # This is basically the implied calculation of CMake's Dependent Option,
+      # but it looks like there's a weird bug in how that is supposed to set it for this use case.
+      if(option_type EQUAL 0)
+        if(ENABLE_DEVELOPER_MODE)
+          set(OPT_${option_name} ${option_developer_default} CACHE BOOL "${option_description}" FORCE)
+        else()
+          # Internal implies force
+          set(OPT_${option_name} ${option_user_default} CACHE INTERNAL "${option_description}")
+        endif()
+      else()
+        if(ENABLE_DEVELOPER_MODE)
+          set(OPT_${option_name} "${option_developer_default}" CACHE STRING "${option_description}" FORCE)
+        else()
+          # Internal implies force
+          set(OPT_${option_name} "${option_user_default}" CACHE INTERNAL "${option_description}")
+        endif()
+      endif()
     endif()
 
-    # We want to create an opt called OPT_${option_name} that holds the final value, with the correct defaults.
-    if(option_type EQUAL 0)
-      option(OPT_${option_name} "${option_description}" ${option_implicit_default})
-    else()
-      set(OPT_${option_name} "${option_implicit_default}" CACHE STRING "${option_description}")
-    endif()
-
-    # The original project_options has some fanciness with cmake_dependent_option.
-    # Unfortunately that only works with boolean options, not strings.
-    # Therefore, we can't have this "toggled based on dev mode" logic.
-    # What this means: if you change developer mode, you have to reconfigure because none of the other stuff will be respected.
-    # It's likely that you'd need to blow away the build folder and start again.
-
+    # Set the _VALUE version to pump into project_options only if it isn't "falsey"
     if(OPT_${option_name})
       if(option_type EQUAL 0)
         set(${option_name}_VALUE ${option_name})

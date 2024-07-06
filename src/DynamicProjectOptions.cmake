@@ -214,8 +214,7 @@ macro(dynamic_project_options)
       set(option_developer_default ${${option_name}_DEVELOPER_DEFAULT})
     endif()
 
-
-    if(OPT_${option_name}) # user has specified the op
+    if(DEFINED OPT_${option_name}) # user has specified the op
       # Create the implicit default based on the current dev mode setting
       if(ENABLE_DEVELOPER_MODE)
         set(option_implicit_default ${option_developer_default})
@@ -252,9 +251,9 @@ macro(dynamic_project_options)
       if(option_type EQUAL 0)
         set(${option_name}_VALUE ${option_name})
       elseif(option_type EQUAL 1)
-        set(${option_name}_VALUE ${option_name} "${OPT_${option_name}}")
+        set(${option_name}_VALUE "${OPT_${option_name}}")
       elseif(option_type EQUAL 2)
-        set(${option_name}_VALUE ${option_name} ${OPT_${option_name}})
+        set(${option_name}_VALUE ${OPT_${option_name}})
       endif()
     else()
       unset(${option_name}_VALUE)
